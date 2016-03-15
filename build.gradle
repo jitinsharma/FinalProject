@@ -5,7 +5,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.google.appengine:gradle-appengine-plugin:1.9.32'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -17,3 +18,22 @@ allprojects {
         jcenter()
     }
 }
+
+task appEngineStartTask(dependsOn: ':backend:appengineRun'){
+    project(":backend").afterEvaluate { backend ->
+        backend.extensions.appengine.daemon = true
+    }
+}
+task testTask(dependsOn: ':app:connectedAndroidTest'){
+
+}
+
+task appEngineStopTask(dependsOn: ':backend:appengineStop'){
+
+}
+
+task runMyTest(dependsOn: ['appEngineStartTask','testTask','appEngineStopTask']){
+}
+
+appEngineStopTask.mustRunAfter testTask
+testTask.mustRunAfter appEngineStartTask
